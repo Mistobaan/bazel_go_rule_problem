@@ -4,7 +4,7 @@
 #   https://github.com/google/protobuf/blob/master/protobuf.bzl
 #   https://github.com/google/kythe/blob/master/tools/build_rules/proto.bzl
 
-load("/tools/build_rules/go/def", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 def _GenDir(ctx):
   if not ctx.attr.includes:

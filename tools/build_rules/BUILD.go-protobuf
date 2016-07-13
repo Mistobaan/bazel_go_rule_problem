@@ -1,4 +1,4 @@
-load("/tools/build_rules/go/def", "go_binary", "go_library", "go_prefix")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_binary")
 
 go_library(
   name = "proto",

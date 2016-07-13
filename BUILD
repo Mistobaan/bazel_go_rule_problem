@@ -1,3 +1,3 @@
-load("/tools/build_rules/go/def", "go_prefix")
+load("@io_bazel_rules_go//go:def.bzl", "go_prefix")
 
 go_prefix("github.com/davidsantiago/bazel_go_rule_problem")

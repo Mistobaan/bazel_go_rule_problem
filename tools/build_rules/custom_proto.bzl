@@ -30,17 +30,21 @@ def _proto_gen_impl(ctx):
     import_flags += dep.proto.import_flags
     deps += dep.proto.deps
 
+  inputs = srcs + deps
+
   args = []
   if ctx.attr.gen_cc:
     args += ["--cpp_out=" + ctx.var["GENDIR"] + "/" + gen_dir]
   if ctx.attr.gen_go:
+    inputs += [ctx.executable.protoc_gen_go]
     args += ["--go_out=" + ctx.var["GENDIR"] + "/" + gen_dir]
+    args += ["--plugin=protoc-gen-go=" + ctx.executable.protoc_gen_go.path]
   if ctx.attr.gen_py:
     args += ["--python_out=" + ctx.var["GENDIR"] + "/" + gen_dir]
 
   if args:
     ctx.action(
-      inputs=srcs + deps,
+      inputs=inputs,
       outputs=ctx.outputs.outs,
       arguments=args + import_flags + [s.path for s in srcs],
       executable=ctx.executable.protoc,
@@ -65,6 +69,12 @@ _proto_gen = rule(
       single_file = True,
       mandatory = True,
     ),
+    "protoc_gen_go": attr.label(
+      cfg = HOST_CFG,
+      executable = True,
+      single_file = False,
+      mandatory = False,
+    ),
     "gen_cc": attr.bool(),
     "gen_go": attr.bool(),
     "gen_py": attr.bool(),
@@ -83,6 +93,7 @@ def go_proto_library(name,
                     go_libs=[],
                     include=None,
                     protoc="//external:protoc",
+                    protoc_gen_go="//external:protoc_gen_go",
                     **kargs):
   """Bazel rule to create a Go protobuf library from proto source files
   Args:
@@ -106,6 +117,7 @@ def go_proto_library(name,
     deps=[s + "_genproto" for s in deps],
     includes=includes,
     protoc=protoc,
+    protoc_gen_go=protoc_gen_go,
     gen_go=1,
     outs=outs,
     visibility=["//visibility:public"],
